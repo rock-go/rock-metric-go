@@ -1,6 +1,7 @@
 package account
 
 import (
+	"github.com/StackExchange/wmi"
 	"time"
 )
 
@@ -36,7 +37,7 @@ type Account struct {
 }
 
 type Accounts []*Account
-type Groups   []*Group
+type Groups []*Group
 
 var (
 	WQLAccount = "SELECT * FROM Win32_UserAccount"
