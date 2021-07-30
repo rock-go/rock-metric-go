@@ -4,6 +4,8 @@ import (
 	"github.com/rock-go/rock/lua"
 )
 
+func (m *Memory) DisableReflect() {}
+
 func (m *Memory) Get(L *lua.LState , key string) lua.LValue {
 	if key == "json" {
 		return lua.JsonMarshal(L , m)
