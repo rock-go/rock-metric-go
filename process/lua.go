@@ -4,16 +4,16 @@ import (
 	"github.com/rock-go/rock/lua"
 )
 
-func (s *Summary) Get(L *lua.LState , key string) lua.LValue {
+func (s *Summary) Get(L *lua.LState, key string) lua.LValue {
 	if key == "json" {
-		return lua.JsonMarshal(L , s)
+		return lua.JsonMarshal(L, s)
 	}
 	return lua.LNil
 }
 
-func (p *Process) Get(L *lua.LState , key string) lua.LValue {
+func (p *Process) Get(L *lua.LState, key string) lua.LValue {
 	if key == "json" {
-		return lua.JsonMarshal(L , p)
+		return lua.JsonMarshal(L, p)
 	}
 
 	return lua.LNil
@@ -45,6 +45,6 @@ func getProcByPid(L *lua.LState) int {
 }
 
 func Inject(kv lua.UserKV) {
-	kv.Set("process" , lua.NewFunction(newLuaProc))
-	kv.Set("process_by_pid" , lua.NewFunction(getProcByPid))
+	kv.Set("process", lua.NewFunction(newLuaProc))
+	kv.Set("process_by_pid", lua.NewFunction(getProcByPid))
 }

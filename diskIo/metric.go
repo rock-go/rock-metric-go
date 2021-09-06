@@ -62,7 +62,7 @@ func (m *Metric) calMetric() detail {
 			logger.Errorf("get %s disk last stat error", name)
 			continue
 		}
-		d = append(d , *calStat(lastStat, nowStat, delta))
+		d = append(d, *calStat(lastStat, nowStat, delta))
 	}
 
 	return d

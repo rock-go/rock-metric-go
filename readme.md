@@ -17,7 +17,8 @@ rock.Inject(env, metric.LuaInjectApi)
 ```
 
 ## lua 脚本调用
-获取的是系统各个信息的对象， 类型为AnyData ,但是封装了对应json对象 
+
+获取的是系统各个信息的对象， 类型为AnyData ,但是封装了对应json对象
 
 每个函数被调用时仅执行一次，只获取一次数据，获取到的数据为userdata，其值为golang的[]byte数据类型，json格式
 

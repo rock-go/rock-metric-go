@@ -36,7 +36,7 @@ func newDiskIoDetail() (detail, error) {
 	}
 
 	d = CacheMetric.calMetric()
-	return d , nil
+	return d, nil
 
 }
 

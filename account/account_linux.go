@@ -25,7 +25,7 @@ type Group struct {
 }
 
 type Accounts []*Account
-type Groups   []*Group
+type Groups []*Group
 
 var (
 	ACCOUNT = "/etc/passwd"

@@ -6,9 +6,9 @@ import (
 
 func (m *Memory) DisableReflect() {}
 
-func (m *Memory) Get(L *lua.LState , key string) lua.LValue {
+func (m *Memory) Get(L *lua.LState, key string) lua.LValue {
 	if key == "json" {
-		return lua.JsonMarshal(L , m)
+		return lua.JsonMarshal(L, m)
 	}
 	return lua.LNil
 }
@@ -25,5 +25,5 @@ func newLuaMem(L *lua.LState) int {
 }
 
 func Inject(kv lua.UserKV) {
-	kv.Set("mem" , lua.NewFunction(newLuaMem))
+	kv.Set("mem", lua.NewFunction(newLuaMem))
 }

@@ -17,5 +17,5 @@ func GetServiceByLua(L *lua.LState) int {
 }
 
 func Inject(kv lua.UserKV) {
-	kv.Set("service" , lua.NewFunction(GetServiceByLua))
+	kv.Set("service", lua.NewFunction(GetServiceByLua))
 }

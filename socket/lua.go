@@ -4,9 +4,9 @@ import (
 	"github.com/rock-go/rock/lua"
 )
 
-func (s *Summary) Get(L *lua.LState , key string) lua.LValue {
+func (s *Summary) Get(L *lua.LState, key string) lua.LValue {
 	if key == "json" {
-		return lua.JsonMarshal(L , s)
+		return lua.JsonMarshal(L, s)
 	}
 	return lua.LNil
 }
@@ -24,5 +24,5 @@ func getSocketByLua(L *lua.LState) int {
 }
 
 func Inject(kv lua.UserKV) {
-	kv.Set("socket" , lua.NewFunction(getSocketByLua))
+	kv.Set("socket", lua.NewFunction(getSocketByLua))
 }

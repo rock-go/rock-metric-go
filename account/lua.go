@@ -4,17 +4,17 @@ import (
 	"github.com/rock-go/rock/lua"
 )
 
-func (a *Accounts) Get(L *lua.LState , key string) lua.LValue {
+func (a *Accounts) Get(L *lua.LState, key string) lua.LValue {
 	if key == "json" {
-		return lua.JsonMarshal(L , a)
+		return lua.JsonMarshal(L, a)
 	}
 
 	return lua.LNil
 }
 
-func (g *Groups) Get(L *lua.LState , key string) lua.LValue {
+func (g *Groups) Get(L *lua.LState, key string) lua.LValue {
 	if key == "json" {
-		return lua.JsonMarshal(L , g)
+		return lua.JsonMarshal(L, g)
 	}
 
 	return lua.LNil
@@ -33,6 +33,6 @@ func getGroupByLua(L *lua.LState) int {
 }
 
 func Inject(kv lua.UserKV) {
-	kv.Set("account" , lua.NewFunction(getAccountByLua))
-	kv.Set("group" , lua.NewFunction(getGroupByLua))
+	kv.Set("account", lua.NewFunction(getAccountByLua))
+	kv.Set("group", lua.NewFunction(getGroupByLua))
 }
