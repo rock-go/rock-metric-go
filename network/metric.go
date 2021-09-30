@@ -62,6 +62,10 @@ func (m *Metric) calMetric() Flow {
 	}
 
 	delta := float64(m.nowSample.timeGet - m.lastSample.timeGet)
+	if delta == 0 {
+		return flow
+	}
+
 	flow.InBytesPerSec = float64(m.nowSample.BytesRecv-m.lastSample.BytesRecv) / delta
 	flow.InPacketsPerSec = float64(m.nowSample.PacketsRecv-m.lastSample.PacketsRecv) / delta
 	flow.OutBytesPerSec = float64(m.nowSample.BytesSent-m.lastSample.BytesSent) / delta

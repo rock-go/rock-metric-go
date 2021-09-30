@@ -2,6 +2,7 @@ package fileSystem
 
 import (
 	"github.com/elastic/gosigar"
+	"math"
 )
 
 type FileSystem struct {
@@ -55,6 +56,10 @@ func getFSStat(fs gosigar.FileSystem) *FileSystem {
 		Used:       stat.Used,
 		UsedPct:    float64(stat.Used) / float64(stat.Used+stat.Avail),
 		Total:      stat.Total,
+	}
+
+	if math.IsNaN(fssStat.UsedPct) || math.IsInf(fssStat.UsedPct, 1) {
+		fssStat.UsedPct = 0
 	}
 
 	return fssStat
