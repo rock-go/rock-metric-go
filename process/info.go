@@ -3,6 +3,8 @@ package process
 import (
 	"fmt"
 	"github.com/elastic/gosigar"
+	"github.com/rock-go/rock/json"
+	"github.com/rock-go/rock/lua"
 	"regexp"
 	"strings"
 	"sync"
@@ -109,4 +111,29 @@ func (s *Summary) getStatsCount(proc *Process) {
 	}
 
 	s.Total++
+}
+
+func (s *Summary) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Tab("")
+	buf.KV("idle"    ,  s.Idle     )
+	buf.KV("running" ,  s.Running  )
+	buf.KV("sleeping",  s.Sleeping )
+	buf.KV("stopped" ,  s.Stopped  )
+	buf.KV("total"   ,  s.Total    )
+	buf.KV("unknown" ,  s.Unknown  )
+	buf.KV("zombie"  ,  s.Zombie   )
+	buf.Arr("process")
+
+	for _ , item := range s.Process {
+		item.Marshal(buf)
+	}
+
+	buf.End("]}")
+
+	return buf.Bytes()
+}
+
+func (s *Summary) String() string {
+	return lua.B2S(s.Byte())
 }

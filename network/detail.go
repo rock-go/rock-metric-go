@@ -1,15 +1,15 @@
 package network
 
-import "github.com/rock-go/rock/lua"
+import (
+	"github.com/rock-go/rock/lua"
+)
 
 type detail []Ifc
 
-// DisableReflect 关闭热反射
-func (d *detail) DisableReflect() {}
+func (d *detail) Byte() []byte {
+	return Json(*d)
+}
 
-func (d *detail) Get(L *lua.LState, key string) lua.LValue {
-	if key == "json" {
-		return lua.JsonMarshal(L, *d)
-	}
-	return lua.LNil
+func (d *detail) String() string {
+	return lua.B2S(d.Byte())
 }

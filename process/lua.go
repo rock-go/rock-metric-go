@@ -24,6 +24,8 @@ func newLuaProc(L *lua.LState) int {
 	n := L.GetTop()
 	if n > 0 {
 		pattern = L.CheckString(1)
+	} else {
+		pattern = "all"
 	}
 
 	proc := GetSummary(pattern)

@@ -4,13 +4,6 @@ import (
 	"github.com/rock-go/rock/lua"
 )
 
-func (hm *HistoryMap) Get(L *lua.LState, key string) lua.LValue {
-	if key == "json" {
-		return lua.JsonMarshal(L, hm)
-	}
-
-	return lua.LNil
-}
 
 func getHistoryByLua(L *lua.LState) int {
 	var username string

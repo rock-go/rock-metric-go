@@ -21,11 +21,10 @@ func GetService(pattern string) []*Service {
 			continue
 		}
 
-		if !strings.Contains(strings.ToLower(newService.Config.DisplayName), pattern) {
-			continue
+		if strings.Contains(strings.ToLower(newService.Config.DisplayName), pattern) || pattern == "all" {
+			serviceList = append(serviceList, getService(newService))
 		}
 
-		serviceList = append(serviceList, getService(newService))
 	}
 
 	return serviceList

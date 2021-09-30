@@ -9,6 +9,8 @@ func newLuaIFC(L *lua.LState) int {
 	n := L.GetTop()
 	if n > 0 {
 		addr = L.CheckString(1)
+	} else {
+		addr = "all"
 	}
 
 	d, err := GetDetail(addr)

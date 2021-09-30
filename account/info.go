@@ -5,6 +5,9 @@ type Info struct {
 	Groups   []*Group
 }
 
+type As []*Account
+type Gs []*Group
+
 func GetInfo() *Info {
 	return GetAll()
 }

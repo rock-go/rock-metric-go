@@ -2,7 +2,9 @@ package account
 
 import (
 	"bufio"
+	"github.com/rock-go/rock/json"
 	"github.com/rock-go/rock/logger"
+	"github.com/rock-go/rock/lua"
 	"io"
 	"os"
 	"strings"
@@ -24,9 +26,6 @@ type Group struct {
 	Raw       string `json:"raw"`
 }
 
-type Accounts []*Account
-type Groups []*Group
-
 var (
 	ACCOUNT = "/etc/passwd"
 	GROUP   = "/etc/group"
@@ -39,14 +38,14 @@ func GetAll() *Info {
 	return &info
 }
 
-func GetAccounts() Accounts {
+func GetAccounts() As {
 	f, err := os.OpenFile(ACCOUNT, os.O_RDONLY, 0666)
 	if err != nil {
 		logger.Errorf("read /etc/passwd error: %v", err)
 		return nil
 	}
 
-	var accounts Accounts
+	var accounts As
 	rd := bufio.NewReaderSize(f, 4096)
 	for {
 		line, err := rd.ReadString('\n')
@@ -72,14 +71,14 @@ func GetAccounts() Accounts {
 	return accounts
 }
 
-func GetGroups() Groups {
+func GetGroups() Gs {
 	f, err := os.OpenFile(GROUP, os.O_RDONLY, 0666)
 	if err != nil {
 		logger.Errorf("read /etc/group error: %v", err)
 		return nil
 	}
 
-	var groups Groups
+	var groups Gs
 	rd := bufio.NewReaderSize(f, 4096)
 	for {
 		line, err := rd.ReadString('\n')
@@ -99,4 +98,45 @@ func GetGroups() Groups {
 	}
 
 	return groups
+}
+
+func (a As) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Arr("")
+	for _ , item := range a {
+		buf.Tab("")
+		buf.KV("login_name",item.LoginName)
+		buf.KV("uid"       ,item.UID)
+		buf.KV("gid"       ,item.GID)
+		buf.KV("user_name" ,item.UserName)
+		buf.KV("home_dir"  ,item.HomeDir)
+		buf.KV("shell"     ,item.Shell)
+		buf.KV("raw"       ,item.Raw)
+		buf.End("},")
+	}
+
+	buf.End("]")
+
+	return buf.Bytes()
+}
+
+func (a As) String() string {
+	return lua.B2S(a.Byte())
+}
+
+func (g Gs) Byte() []byte {
+	buf := json.NewBuffer()
+	for _ , item := range g {
+		buf.WriteByte('{')
+		buf.KV("group_name" , item.GroupName)
+		buf.KV("gid"        , item.GID)
+		buf.KV("raw"        , item.Raw)
+		buf.WriteString("},")
+	}
+	buf.End("]")
+	return buf.Bytes()
+}
+
+func (g Gs) String() string {
+	return lua.B2S(g.Byte())
 }

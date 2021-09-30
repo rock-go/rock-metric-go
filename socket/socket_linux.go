@@ -7,10 +7,12 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 var (
 	InodeProc = make(map[uint32]int)
+	lock sync.Mutex
 )
 
 func GetSockets(s *Summary, f string) {
@@ -22,6 +24,8 @@ func GetSockets(s *Summary, f string) {
 		logger.Errorf("get socket list by netlink error: %v", err)
 		return
 	}
+	lock.Lock()
+	defer lock.Unlock()
 
 	var sockets = make([]*Socket, 0)
 	for _, socketNetlink := range socketList {
@@ -140,6 +144,9 @@ func GetInodesByPid(pid int) {
 	if err != nil {
 		return
 	}
+
+	lock.Lock()
+	defer lock.Unlock()
 
 	for _, name := range names {
 		pathLink := path + name

@@ -2,9 +2,8 @@ package network
 
 import (
 	"errors"
+	"github.com/rock-go/rock/json"
 	"github.com/rock-go/rock/logger"
-	"github.com/rock-go/rock/lua"
-	"github.com/rock-go/rock/utils"
 	netStat "github.com/shirou/gopsutil/net"
 	"net"
 	"strings"
@@ -71,13 +70,8 @@ func GetDetail(filter string) (detail, error) {
 }
 
 // GetBase 获取当前连接网络的网卡的基础信息
-func GetBase(target string) (*Base, error) {
+func GetBase(addr string) (*Base, error) {
 	var base Base
-
-	addr, err := getSocketIP(target)
-	if err != nil {
-		return nil, err
-	}
 
 	// 获取ip，Mac
 	ifcs, err := net.Interfaces()
@@ -165,6 +159,10 @@ func getIfcMetric(ifc net.Interface, f string, isDetail bool) (*Ifc, error) {
 
 // 从设备名和ip地址过滤
 func filter(dev Ifc, f string) bool {
+	if f == "all" {
+		return true
+	}
+
 	if strings.Contains(dev.Name, f) {
 		return true
 	}
@@ -202,62 +200,39 @@ func getSocketIP(addr string) (string, error) {
 	return localAddr, nil
 }
 
-func Json(interfaces map[string]*Ifc) []byte {
+func Json(interfaces []Ifc) []byte {
 	if interfaces == nil {
 		return nil
 	}
 
-	var buf = lua.NewJsonBuffer("")
-	buf.WriteVal("interface")
-	buf.Write([]byte(":"))
-	buf.Write([]byte("["))
+	var buf = json.NewBuffer()
+	buf.Arr("")
 
 	length := len(interfaces)
-	k := 0
-	for _, ifc := range interfaces {
-		var ip4 string
-		var ip6 string
-
-		for _, ip := range ifc.Inet {
-			ip4 = ip4 + ip + " "
-		}
-
-		for _, ip := range ifc.Inet6 {
-			ip6 = ip6 + ip + " "
-		}
-
-		buf.EOF = false
-		buf.Start("")
-		buf.WriteKV("name", ifc.Name)
-		buf.WriteKV("inet", ip4)
-		buf.WriteKV("inet6", ip6)
-		buf.WriteKV("mac", ifc.Mac)
-
-		buf.WriteKV("in_bytes", utils.ToString(ifc.Flow.InBytes))
-		buf.WriteKV("in_packets", utils.ToString(ifc.Flow.InPackets))
-		buf.WriteKV("in_error", utils.ToString(ifc.Flow.InError))
-		buf.WriteKV("in_dropped", utils.ToString(ifc.Flow.InDropped))
-		buf.WriteKV("in_bytes_per_sec", utils.ToString(ifc.InBytesPerSec))
-		buf.WriteKV("in_packet_per_sec", utils.ToString(ifc.Flow.InPacketsPerSec))
-		buf.WriteKV("out_bytes", utils.ToString(ifc.Flow.OutBytes))
-		buf.WriteKV("out_packets", utils.ToString(ifc.Flow.OutPackets))
-		buf.WriteKV("out_error", utils.ToString(ifc.Flow.OutError))
-		buf.WriteKV("out_dropped", utils.ToString(ifc.Flow.OutDropped))
-		buf.WriteKV("out_bytes_per_sec", utils.ToString(ifc.Flow.OutBytesPerSec))
-		buf.EOF = true
-		buf.WriteKV("out_packets_per_sec", utils.ToString(ifc.Flow.OutPacketsPerSec))
-
-		buf.End()
-
-		if k < length-1 {
-			buf.Write([]byte(","))
-		}
-		k++
-
+	for i := 0; i < length ; i++ {
+		ifc := interfaces[i]
+		ipv4 := strings.Join(ifc.Inet , " ")
+		ipv6 := strings.Join(ifc.Inet6 , " ")
+		buf.Tab("")
+		buf.KV("name"                , ifc.Name)
+		buf.KV("inet"                , ipv4)
+		buf.KV("inet6"               , ipv6)
+		buf.KV("mac"                 , ifc.Mac)
+		buf.KV("in_bytes"            , ifc.Flow.InBytes)
+		buf.KV("in_packets"          , ifc.Flow.InPackets)
+		buf.KV("in_error"            , ifc.Flow.InError)
+		buf.KV("in_dropped"          , ifc.Flow.InDropped)
+		buf.KV("in_bytes_per_sec"    , ifc.InBytesPerSec)
+		buf.KV("in_packet_per_sec"   , ifc.Flow.InPacketsPerSec)
+		buf.KV("out_bytes"           , ifc.Flow.OutBytes)
+		buf.KV("out_packets"         , ifc.Flow.OutPackets)
+		buf.KV("out_error"           , ifc.Flow.OutError)
+		buf.KV("out_dropped"         , ifc.Flow.OutDropped)
+		buf.KV("out_bytes_per_sec"   , ifc.Flow.OutBytesPerSec)
+		buf.KV("out_packets_per_sec" , ifc.Flow.OutPacketsPerSec)
+		buf.End("},")
 	}
 
-	buf.Write([]byte("]"))
-	buf.End()
-
+	buf.End("]")
 	return buf.Bytes()
 }

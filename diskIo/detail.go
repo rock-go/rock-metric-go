@@ -2,6 +2,8 @@ package diskIo
 
 import (
 	"errors"
+	"github.com/rock-go/rock/json"
+	"github.com/rock-go/rock/lua"
 	"github.com/shirou/gopsutil/disk"
 )
 
@@ -40,4 +42,24 @@ func newDiskIoDetail() (detail, error) {
 
 }
 
-func (d *detail) DisableReflect() {}
+func (d *detail) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Arr("")
+	for _ , item := range *d {
+		buf.Tab("")
+		buf.KV("name"    , item.Name)
+		buf.KV("serial"  , item.SerialNumber)
+		buf.KL("io_time" , int64(item.IoTime))
+		buf.KL("read"    , int64(item.ReadBytes))
+		buf.KL("write"   , int64(item.WriteBytes))
+		buf.KF64("read_sec_bytes" , item.ReadPerSecBytes)
+		buf.KF64("write_sec_byte" , item.WritePerSecByte)
+		buf.End("},")
+	}
+	buf.End("]")
+	return buf.Bytes()
+}
+
+func (d *detail) String() string {
+	return lua.B2S(d.Byte())
+}

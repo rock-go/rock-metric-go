@@ -2,6 +2,9 @@ package account
 
 import (
 	"github.com/StackExchange/wmi"
+	"github.com/rock-go/rock/audit"
+	"github.com/rock-go/rock/json"
+	"github.com/rock-go/rock/lua"
 	"time"
 )
 
@@ -36,9 +39,6 @@ type Account struct {
 	Status             string    `json:"status"`
 }
 
-type Accounts []*Account
-type Groups []*Group
-
 var (
 	WQLAccount = "SELECT * FROM Win32_UserAccount"
 	WQLGroup   = "SELECT * FROM Win32_Account"
@@ -54,22 +54,81 @@ func GetAll() *Info {
 	}
 }
 
-func GetAccounts() Accounts {
-	var dst Accounts
-	err := wmi.Query(WQLAccount, &dst)
+func GetAccounts() As {
+	var ret As
+	err := wmi.Query(WQLAccount, &ret)
 	if err != nil {
-		return nil
+		audit.Errorf("metric" , "account" , "got account fail , error: %v" , err)
+		return ret
 	}
-
-	return dst
+	return ret
 }
 
-func GetGroups() Groups {
-	var dst Groups
-	err := wmi.Query(WQLGroup, &dst)
+func GetGroups() Gs {
+	var ret Gs
+	err := wmi.Query(WQLGroup, &ret)
 	if err != nil {
 		return nil
 	}
 
-	return dst
+	return ret
+}
+
+func (a As) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Arr("")
+
+	for _ , item := range a {
+		buf.Tab("")
+		buf.KI("account_type"        ,  int(item.AccountType))
+		buf.KV("caption"             ,  item.Caption)
+		buf.KV("description"         ,  item.Description)
+		buf.KB("disabled"            ,  item.Disabled)
+		buf.KV("domain"              ,  item.Domain)
+		buf.KV("full_name"           ,  item.FullName)
+		buf.KT("install_date"        ,  item.InstallDate)
+		buf.KB("local_account"       ,  item.LocalAccount)
+		buf.KB("lockout"             ,  item.Lockout)
+		buf.KV("name"                ,  item.Name)
+		buf.KB("password_changeable" ,  item.PasswordChangeable)
+		buf.KB("password_expires"    ,  item.PasswordExpires)
+		buf.KB("password_required"   ,  item.PasswordRequired)
+		buf.KV("sid"                 ,  item.SID)
+		buf.KI("sid_type"            ,  int(item.SIDType))
+		buf.KV("status"              ,  item.Status)
+		buf.End("},")
+	}
+
+	buf.End("]")
+
+	return buf.Bytes()
+}
+
+func (a As) String() string {
+	return lua.B2S(a.Byte())
+}
+
+func (g Gs) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Arr("")
+	for _ , item := range g {
+		buf.Tab("")
+		buf.KV("caption"      , item.Caption)
+		buf.KV("description"  , item.Description)
+		buf.KV("domain"       , item.Domain)
+		buf.KT("install_date" , item.InstallDate)
+		buf.KB("local_account", item.LocalAccount)
+		buf.KV("name"         , item.Name)
+		buf.KV("sid"          , item.Sid)
+		buf.KI("sid_type"     , int(item.SidType))
+		buf.KV("status"       , item.Status)
+		buf.End("},")
+	}
+
+	buf.End("]")
+	return buf.Bytes()
+}
+
+func (g Gs) String() string {
+	return lua.B2S(g.Byte())
 }

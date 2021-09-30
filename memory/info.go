@@ -4,7 +4,9 @@ import (
 	sysInfo "github.com/elastic/go-sysinfo"
 	sysInfoTypes "github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/gosigar"
+	"github.com/rock-go/rock/json"
 	"github.com/rock-go/rock/logger"
+	"github.com/rock-go/rock/lua"
 	"runtime"
 )
 
@@ -77,4 +79,23 @@ func GetVMStat() (*sysInfoTypes.VMStatInfo, error) {
 	}
 
 	return nil, err
+}
+
+func (mem *Memory) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Tab("")
+	buf.KL("total"          , int64(mem.Total))
+	buf.KL("free"           , int64(mem.Free))
+	buf.KL("used_pct"       , int64(mem.UsedPct))
+	buf.KL("swap_total"     , int64(mem.SwapTotal))
+	buf.KL("swap_free"      , int64(mem.SwapFree))
+	buf.KL("swap_used_pct"  , int64(mem.SwapUsedPct))
+	buf.KL("swap_in_pages"  , int64(mem.SwapInPages))
+	buf.KL("swap_out_pages" , int64(mem.SwapOutPages))
+	buf.End("}")
+	return buf.Bytes()
+}
+
+func (mem *Memory) String() string {
+	return lua.B2S(mem.Byte())
 }

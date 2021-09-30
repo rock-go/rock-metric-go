@@ -38,6 +38,10 @@ func (m *Metric) GetProc(pid int, filter string) *Process {
 		return nil
 	}
 
+	if filter == "all" {
+		goto DO
+	}
+
 	if !strings.Contains(strings.ToLower(proc.Name), filter) {
 		return nil
 	}
@@ -45,7 +49,7 @@ func (m *Metric) GetProc(pid int, filter string) *Process {
 	//if !m.matchProc(proc.Name) {
 	//	return nil
 	//}
-
+DO:
 	proc.GetDetail()
 
 	// 计算CPU使用

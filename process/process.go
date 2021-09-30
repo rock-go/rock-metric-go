@@ -2,6 +2,8 @@ package process
 
 import (
 	"github.com/elastic/gosigar"
+	"github.com/rock-go/rock/json"
+	"github.com/rock-go/rock/lua"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -166,4 +168,49 @@ func (p *Process) GetInodes() {
 	p.inodes = inodes
 
 	return
+}
+
+func (p *Process) Marshal(buf *json.Buffer) {
+	buf.Tab("")
+	buf.KV("name"           , p.Name)
+	buf.KV("state"          , p.State)
+	buf.KV("pid"            , p.Pid)
+	buf.KV("ppid"           , p.Ppid)
+	buf.KV("pgid"           , p.Pgid)
+	buf.KV("cmdline"        , p.Cmdline)
+	buf.KV("username"       , p.Username)
+	buf.KV("cwd"            , p.Cwd)
+	buf.KV("executable"     , p.Executable)
+	buf.KV("args"           , p.Args)
+	buf.KV("user_ticks"     , p.UserTicks)
+	buf.KV("total_pct"      , p.TotalPct)
+	buf.KV("total_norm_pct" , p.TotalNormPct)
+	buf.KV("system_ticks"   , p.SystemTicks)
+	buf.KV("total_ticks"    , p.TotalTicks)
+	buf.KV("start_time"     , p.StartTime)
+	buf.KV("user_ticks"     , p.UserTicks)
+	buf.KV("total_pct"      , p.TotalPct)
+	buf.KV("total_norm_pct" , p.TotalNormPct)
+	buf.KV("system_ticks"   , p.SystemTicks)
+	buf.KV("total_ticks"    , p.TotalTicks)
+	buf.KV("start_time"     , p.StartTime)
+
+	buf.KV("mem_size"       , p.MemSize  )
+	buf.KV("rss_bytes"      , p.RssBytes )
+	buf.KV("rss_pct"        , p.RssPct   )
+	buf.KV("share"          , p.Share    )
+	buf.KV("inodes"         , p.inodes)
+	buf.KV("sample_time"    , p.SampleTime)
+	buf.End("},")
+}
+
+func (p *Process) Byte() []byte {
+	buf := json.NewBuffer()
+	p.Marshal(buf)
+	buf.End("")
+	return buf.Bytes()
+}
+
+func (p *Process) String() string {
+	return lua.B2S(p.Byte())
 }

@@ -5,14 +5,13 @@ import (
 	"github.com/rock-go/rock-metric-go/cpu"
 	"github.com/rock-go/rock-metric-go/fileSystem"
 	"github.com/rock-go/rock-metric-go/network"
+	"github.com/rock-go/rock/json"
 	"github.com/rock-go/rock/lua"
 	"github.com/shirou/gopsutil/host"
 	"runtime"
 )
 
 type BasicInfo struct {
-	lua.NoReflect
-
 	Inet      string  `json:"inet"`
 	Inet6     string  `json:"inet6"`
 	Mac       string  `json:"mac"`
@@ -77,4 +76,33 @@ func Get(target string) (*BasicInfo, error) {
 	info.DiskFree = free
 
 	return &info, nil
+}
+
+func (b *BasicInfo) Byte() []byte {
+	buf := json.NewBuffer()
+	buf.Tab("")
+	buf.KV("inet" , b.Inet)
+	buf.KV("inet6" , b.Inet6)
+	buf.KV("mac" , b.Mac)
+	buf.KV("inet"      ,b.Inet)
+	buf.KV("inet6"     ,b.Inet6)
+	buf.KV("mac"       ,b.Mac)
+	buf.KV("arch"      ,b.Arch)
+	buf.KV("platform"  ,b.Platform)
+	buf.KL("mem_total" ,int64(b.MemTotal))
+	buf.KL("mem_free"  ,int64(b.MemFree))
+	buf.KL("swap_total",int64(b.SwapTotal))
+	buf.KL("swap_free" ,int64(b.SwapFree))
+	buf.KI("cpu_core"  ,b.CpuCore)
+	buf.KL("cpu_usage" ,int64(b.CpuUsage))
+	buf.KL("disk_total",int64(b.DiskTotal))
+	buf.KV("disk_path" ,b.DiskPath)
+	buf.KL("disk_free" ,int64(b.DiskFree))
+	buf.End("}")
+
+	return buf.Bytes()
+}
+
+func (b *BasicInfo) String() string {
+	return lua.B2S(b.Byte())
 }

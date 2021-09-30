@@ -2,37 +2,24 @@ package base
 
 import (
 	"github.com/rock-go/rock/lua"
+	"github.com/rock-go/rock/node"
 )
 
 type Receipt struct {
 	Successful bool `json:"successful"`
 }
 
-func (bi *BasicInfo) Get(L *lua.LState, key string) lua.LValue {
-	if key == "json" {
-		return lua.JsonMarshal(L, bi)
-	}
-	return lua.LNil
-}
-
-func luaBaseGet(L *lua.LState) int {
-	target := "8.8.8.8:53"
-	n := L.GetTop()
-	if n > 0 {
-		target = L.CheckString(1)
-	}
-
-	info, err := Get(target)
+func getByLua(L *lua.LState) int {
+	info , err :=  Get(node.LoadAddr())
 	if err != nil {
-		L.RaiseError("get basic info error: %v", err)
+		L.RaiseError("%s get basic info err: %v" , err)
 		return 0
 	}
 
-	data := L.NewAnyData(info)
-	L.Push(data)
+	L.Push(L.NewAnyData(info))
 	return 1
 }
 
 func Inject(kv lua.UserKV) {
-	kv.Set("base", lua.NewFunction(luaBaseGet))
+	kv.Set("base", lua.NewFunction(getByLua))
 }
