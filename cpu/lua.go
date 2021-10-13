@@ -8,7 +8,12 @@ var sample = Metric{}
 
 func newLuaCpu(L *lua.LState) int {
 	info := Get(&sample)
-	L.Push(L.NewAnyData(info))
+	if info == nil {
+		L.Push(lua.LNil)
+	} else {
+		L.Push(L.NewAnyData(info))
+	}
+
 	return 1
 }
 

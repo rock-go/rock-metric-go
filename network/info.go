@@ -29,12 +29,18 @@ type Base struct {
 	Mac   string
 }
 
-var IfcMetrics map[string]Metric // 缓存所有网卡的统计信息
-var Stats map[string]*netStat.IOCountersStat
+
+var IfcMetrics IfcMetricsMap // 缓存所有网卡的统计信息
+var Stats StatMetricsMap
 
 func init() {
-	IfcMetrics = make(map[string]Metric)
-	Stats = make(map[string]*netStat.IOCountersStat)
+	IfcMetrics = IfcMetricsMap{
+		dirty: make(map[string]Metric , 64),
+	}
+
+	Stats = StatMetricsMap{
+		dirty: make(map[string]netStat.IOCountersStat , 64),
+	}
 }
 
 // GetDetail 获取所有的统计数据
@@ -57,7 +63,7 @@ func GetDetail(filter string) (detail, error) {
 
 	for _, s := range stats {
 		name := s.Name
-		Stats[name] = &s
+		Stats.store(name , s)
 	}
 
 	for _, ifc := range ifcs {
@@ -137,21 +143,15 @@ func getIfcMetric(ifc net.Interface, f string, isDetail bool) (*Ifc, error) {
 	if !isDetail {
 		return &dev, nil
 	}
+	var metric Metric
+	var stat netStat.IOCountersStat
 
-	metric, ok := IfcMetrics[ifc.Name]
-	if !ok {
-		metric = Metric{
-			lastSample: Sample{},
-			nowSample:  Sample{},
-		}
-	}
+	metric = IfcMetrics.load(ifc.Name)
+	if Stats.last(ifc.Name , &stat) {
+		metric.getMetric(stat)
+		IfcMetrics.store(ifc.Name , metric)
+		dev.Flow = metric.calMetric()
 
-	stat := Stats[ifc.Name]
-	if stat != nil {
-		metric.getMetric(*stat)
-		IfcMetrics[ifc.Name] = metric
-		flow := metric.calMetric()
-		dev.Flow = flow
 	}
 
 	return &dev, nil
