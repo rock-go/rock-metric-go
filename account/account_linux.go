@@ -44,6 +44,7 @@ func GetAccounts() As {
 		logger.Errorf("read /etc/passwd error: %v", err)
 		return nil
 	}
+	defer f.Close()
 
 	var accounts As
 	rd := bufio.NewReaderSize(f, 4096)
@@ -77,6 +78,7 @@ func GetGroups() Gs {
 		logger.Errorf("read /etc/group error: %v", err)
 		return nil
 	}
+	defer f.Close()
 
 	var groups Gs
 	rd := bufio.NewReaderSize(f, 4096)
@@ -103,15 +105,15 @@ func GetGroups() Gs {
 func (a As) Byte() []byte {
 	buf := json.NewBuffer()
 	buf.Arr("")
-	for _ , item := range a {
+	for _, item := range a {
 		buf.Tab("")
-		buf.KV("login_name",item.LoginName)
-		buf.KV("uid"       ,item.UID)
-		buf.KV("gid"       ,item.GID)
-		buf.KV("user_name" ,item.UserName)
-		buf.KV("home_dir"  ,item.HomeDir)
-		buf.KV("shell"     ,item.Shell)
-		buf.KV("raw"       ,item.Raw)
+		buf.KV("login_name", item.LoginName)
+		buf.KV("uid", item.UID)
+		buf.KV("gid", item.GID)
+		buf.KV("user_name", item.UserName)
+		buf.KV("home_dir", item.HomeDir)
+		buf.KV("shell", item.Shell)
+		buf.KV("raw", item.Raw)
 		buf.End("},")
 	}
 
@@ -126,11 +128,11 @@ func (a As) String() string {
 
 func (g Gs) Byte() []byte {
 	buf := json.NewBuffer()
-	for _ , item := range g {
+	for _, item := range g {
 		buf.WriteByte('{')
-		buf.KV("group_name" , item.GroupName)
-		buf.KV("gid"        , item.GID)
-		buf.KV("raw"        , item.Raw)
+		buf.KV("group_name", item.GroupName)
+		buf.KV("gid", item.GID)
+		buf.KV("raw", item.Raw)
 		buf.WriteString("},")
 	}
 	buf.End("]")
