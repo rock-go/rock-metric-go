@@ -69,7 +69,7 @@ func getUnits(conn *dbus.Conn, states, patterns []string) []dbus.UnitStatus {
 			logger.Debugf("get dbus unit success by %v", unit)
 			return units
 		} else {
-			logger.Errorf("get dbus unit by %v error: %v", unit, err)
+			logger.Debugf("get dbus unit by %v error: %v", unit, err)
 		}
 	}
 
