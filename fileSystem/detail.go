@@ -20,7 +20,13 @@ func newFileSystemDetail() (detail, error) {
 
 	fsStats := make([]FileSystem, len(fsList.List))
 	for i, fs := range fsList.List {
-		fsStats[i] = *getFSStat(fs)
+		fileSystem := getFSStat(fs)
+		if fileSystem != nil {
+			fsStats[i] = *fileSystem
+			continue
+		}
+
+		fsStats[i] = FileSystem{}
 	}
 
 	return fsStats, nil

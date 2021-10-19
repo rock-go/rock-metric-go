@@ -2,6 +2,7 @@ package fileSystem
 
 import (
 	"github.com/elastic/gosigar"
+	"github.com/rock-go/rock/logger"
 	"math"
 )
 
@@ -44,6 +45,7 @@ func GetMax() (path string, total uint64, free uint64, err error) {
 func getFSStat(fs gosigar.FileSystem) *FileSystem {
 	stat := gosigar.FileSystemUsage{}
 	if err := stat.Get(fs.DirName); err != nil {
+		logger.Errorf("get file system stat error: %v", err)
 		return nil
 	}
 
