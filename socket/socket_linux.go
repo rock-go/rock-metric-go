@@ -12,7 +12,7 @@ import (
 
 var (
 	InodeProc = make(map[uint32]int)
-	lock sync.Mutex
+	lock      sync.Mutex
 )
 
 func GetSockets(s *Summary, f string) {
@@ -139,6 +139,7 @@ func GetInodesByPid(pid int) {
 	if err != nil {
 		return
 	}
+	defer d.Close()
 
 	names, err := d.Readdirnames(-1)
 	if err != nil {

@@ -1,4 +1,6 @@
-//+build linux
+//go:build linux
+// +build linux
+
 // linux history commands
 
 package command
@@ -38,6 +40,7 @@ func GetFromFile(user account.Account) []*History {
 		logger.Errorf("read .bash_history error: %v", err)
 		return nil
 	}
+	defer f.Close()
 
 	var histories []*History
 	rd := bufio.NewReader(f)

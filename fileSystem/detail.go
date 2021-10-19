@@ -3,6 +3,7 @@ package fileSystem
 import (
 	"github.com/elastic/gosigar"
 	"github.com/rock-go/rock/json"
+	"github.com/rock-go/rock/logger"
 	"github.com/rock-go/rock/lua"
 )
 
@@ -13,6 +14,7 @@ func newFileSystemDetail() (detail, error) {
 	fsList := gosigar.FileSystemList{}
 	err := fsList.Get()
 	if err != nil {
+		logger.Errorf("get file system list error: %v", err)
 		return nil, err
 	}
 
@@ -28,16 +30,16 @@ func (d detail) Byte() []byte {
 	buf := json.NewBuffer()
 	buf.Arr("")
 
-	for _ , item := range d {
+	for _, item := range d {
 		buf.Tab("")
-		buf.KV("name" , item.Name)
-		buf.KV("type" , item.Type)
-		buf.KV("mount" , item.MountPoint)
-		buf.KL("available" , int64(item.Available))
-		buf.KL("free" , int64(item.Free))
-		buf.KL("used" , int64(item.Used))
-		buf.KF64("used_pct" , item.UsedPct)
-		buf.KL("total" , int64(item.Total))
+		buf.KV("name", item.Name)
+		buf.KV("type", item.Type)
+		buf.KV("mount", item.MountPoint)
+		buf.KL("available", int64(item.Available))
+		buf.KL("free", int64(item.Free))
+		buf.KL("used", int64(item.Used))
+		buf.KF64("used_pct", item.UsedPct)
+		buf.KL("total", int64(item.Total))
 		buf.End("},")
 	}
 	buf.End("]")
