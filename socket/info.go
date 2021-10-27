@@ -12,6 +12,7 @@ type Socket struct {
 	RemoteIP   string `json:"remote_ip"`
 	RemotePort int    `json:"remote_port"`
 	Pid        uint32 `json:"pid"`
+	Process    string `json:"process"`
 }
 
 type Summary struct {
@@ -46,21 +47,21 @@ func GetSpecifiedSockets() {
 func (s *Summary) Byte() []byte {
 	buf := json.NewBuffer()
 	buf.Tab("")
-	buf.KV("closed"      , s.CLOSED      )
-	buf.KV("listen"      , s.LISTEN      )
-	buf.KV("syn_sent"    , s.SYN_SENT    )
-	buf.KV("syn_rcvd"    , s.SYN_RCVD    )
-	buf.KV("established" , s.ESTABLISHED )
-	buf.KV("fin_wait1"   , s.FIN_WAIT1   )
-	buf.KV("fin_wait2"   , s.FIN_WAIT2   )
-	buf.KV("close_wait"  , s.CLOSE_WAIT  )
-	buf.KV("closing"     , s.CLOSING     )
-	buf.KV("last_ack"    , s.LAST_ACK    )
-	buf.KV("time_wait"   , s.TIME_WAIT   )
-	buf.KV("delete_tcb"  , s.DELETE_TCB  )
+	buf.KV("closed", s.CLOSED)
+	buf.KV("listen", s.LISTEN)
+	buf.KV("syn_sent", s.SYN_SENT)
+	buf.KV("syn_rcvd", s.SYN_RCVD)
+	buf.KV("established", s.ESTABLISHED)
+	buf.KV("fin_wait1", s.FIN_WAIT1)
+	buf.KV("fin_wait2", s.FIN_WAIT2)
+	buf.KV("close_wait", s.CLOSE_WAIT)
+	buf.KV("closing", s.CLOSING)
+	buf.KV("last_ack", s.LAST_ACK)
+	buf.KV("time_wait", s.TIME_WAIT)
+	buf.KV("delete_tcb", s.DELETE_TCB)
 	buf.Arr("sockets")
 
-	for _ , item := range s.Sockets {
+	for _, item := range s.Sockets {
 		item.Marshal(buf)
 	}
 	buf.End("]}")
@@ -75,12 +76,13 @@ func (s *Summary) String() string {
 func (s *Socket) Marshal(buf *json.Buffer) {
 	buf.Tab("")
 
-	buf.KV("state"       , s.State      )
-	buf.KV("local_ip"    , s.LocalIP    )
-	buf.KV("local_port"  , s.LocalPort  )
-	buf.KV("remote_ip"   , s.RemoteIP   )
-	buf.KV("remote_port" , s.RemotePort )
-	buf.KV("pid"         , s.Pid        )
+	buf.KV("state", s.State)
+	buf.KV("local_ip", s.LocalIP)
+	buf.KV("local_port", s.LocalPort)
+	buf.KV("remote_ip", s.RemoteIP)
+	buf.KV("remote_port", s.RemotePort)
+	buf.KV("pid", s.Pid)
+	buf.KV("process_name", s.Process)
 
 	buf.End("},")
 }

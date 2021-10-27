@@ -38,6 +38,13 @@ func GetSockets(s *Summary, f string) {
 			Pid:        uint32(InodeProc[socketNetlink.Inode]),
 		}
 
+		state := gosigar.ProcState{}
+		err = state.Get(int(socket.Pid))
+		if err != nil {
+			logger.Debugf("get process name of pid [%d] error: %v", socket.Pid, err)
+		}
+		socket.Process = state.Name
+
 		if filter(*socket, f) {
 			sockets = append(sockets, socket)
 			getStats(s, *socket)
@@ -53,7 +60,8 @@ func filter(socket Socket, s string) bool {
 
 	if strings.Contains(socket.LocalIP, s) ||
 		strings.Contains(socket.RemoteIP, s) ||
-		strings.Contains(socket.State, s) {
+		strings.Contains(socket.State, s) ||
+		strings.Contains(strings.ToLower(socket.Process), strings.ToLower(s)) {
 		return true
 	}
 

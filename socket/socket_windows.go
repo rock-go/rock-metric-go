@@ -2,6 +2,7 @@ package socket
 
 import (
 	"fmt"
+	"github.com/elastic/gosigar"
 	"github.com/rock-go/rock/logger"
 	"reflect"
 	"strconv"
@@ -107,7 +108,7 @@ func GetSockets(summary *Summary, f string) {
 }
 
 func format(mib MIB_TCPROW2) *Socket {
-	return &Socket{
+	socket := Socket{
 		State:      mib.dwState.String(),
 		LocalIP:    mib.dwLocalAddr.String(),
 		LocalPort:  mib.dwLocalPort.Int(),
@@ -115,6 +116,15 @@ func format(mib MIB_TCPROW2) *Socket {
 		RemotePort: mib.dwRemotePort.Int(),
 		Pid:        mib.dwOwningPid,
 	}
+
+	state := gosigar.ProcState{}
+	err := state.Get(int(socket.Pid))
+	if err != nil {
+		logger.Debugf("get process name of pid [%d] error: %v", socket.Pid, err)
+	}
+	socket.Process = state.Name
+
+	return &socket
 }
 
 func filter(socket Socket, s string) bool {
@@ -124,7 +134,8 @@ func filter(socket Socket, s string) bool {
 
 	if strings.Contains(socket.LocalIP, s) ||
 		strings.Contains(socket.RemoteIP, s) ||
-		strings.Contains(socket.State, s) {
+		strings.Contains(socket.State, s) ||
+		strings.Contains(strings.ToLower(socket.Process), strings.ToLower(s)) {
 		return true
 	}
 
