@@ -120,12 +120,12 @@ func format(mib MIB_TCPROW2) *Socket {
 	state := gosigar.ProcState{}
 	err := state.Get(int(socket.Pid))
 	if err != nil {
-		socket.Process  = "unknown"
-		socket.Username = "unknown"
+		socket.Process  = ""
+		socket.Username = ""
 		//logger.Debugf("get process name of pid [%d] error: %v", socket.Pid, err)
 	} else {
 		socket.Process = state.Name
-		socket.Process = state.Username
+		socket.Username = state.Username
 	}
 
 	return &socket
