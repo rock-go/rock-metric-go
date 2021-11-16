@@ -1,22 +1,17 @@
 package fileSystem
 
 import (
+	"github.com/rock-go/rock/audit"
 	"github.com/rock-go/rock/lua"
 )
 
-func (d *detail) Get(L *lua.LState, key string) lua.LValue {
-	if key == "json" {
-		return lua.JsonMarshal(L, d)
-	}
-
-	return lua.LNil
-
-}
 
 func newLuaFileSystem(L *lua.LState) int {
+	audit.RecoverByCodeVM(L, audit.Subject("file system info error"))
+
 	fs, err := newFileSystemDetail()
 	if err != nil {
-		L.RaiseError("get file system info error: %v", err)
+		panic(err)
 		return 0
 	}
 

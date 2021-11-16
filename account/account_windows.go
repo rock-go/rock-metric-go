@@ -2,8 +2,8 @@ package account
 
 import (
 	"github.com/StackExchange/wmi"
-	"github.com/rock-go/rock/audit"
 	"github.com/rock-go/rock/json"
+	"github.com/rock-go/rock/logger"
 	"github.com/rock-go/rock/lua"
 	"time"
 )
@@ -58,7 +58,7 @@ func GetAccounts() As {
 	var ret As
 	err := wmi.Query(WQLAccount, &ret)
 	if err != nil {
-		audit.Errorf("metric" , "account" , "got account fail , error: %v" , err)
+		logger.Errorf("metric account got account fail error %v" , err)
 		return ret
 	}
 	return ret

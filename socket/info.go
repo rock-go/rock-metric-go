@@ -6,13 +6,14 @@ import (
 )
 
 type Socket struct {
-	State      string `json:"state"`
-	LocalIP    string `json:"local_ip"`
-	LocalPort  int    `json:"local_port"`
-	RemoteIP   string `json:"remote_ip"`
-	RemotePort int    `json:"remote_port"`
-	Pid        uint32 `json:"pid"`
-	Process    string `json:"process"`
+	State      string  `json:"state"`
+	LocalIP    string  `json:"local_ip"`
+	LocalPort  int     `json:"local_port"`
+	RemoteIP   string  `json:"remote_ip"`
+	RemotePort int     `json:"remote_port"`
+	Pid        uint32  `json:"pid"`
+	Process    string  `json:"process"`
+	Username   string  `json:"username"`
 }
 
 type Summary struct {
